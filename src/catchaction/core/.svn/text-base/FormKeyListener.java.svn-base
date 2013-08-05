@@ -1,0 +1,28 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package catchaction.core;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+/**
+ *
+ * @author kanishka
+ */
+public class FormKeyListener implements KeyListener {
+
+    public void keyTyped(KeyEvent e) {
+    }
+
+    public void keyPressed(KeyEvent e) {
+        if(KeyEvent.VK_LEFT==e.getKeyCode()){
+        System.out.println("Left");
+        }
+
+    }
+
+    public void keyReleased(KeyEvent e) {
+    }
+}

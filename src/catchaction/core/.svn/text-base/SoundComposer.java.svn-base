@@ -1,0 +1,134 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package catchaction.core;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import net.java.games.joal.AL;
+import net.java.games.joal.ALFactory;
+import net.java.games.joal.util.ALut;
+
+/**
+ *
+ * @author kanishka
+ */
+public class SoundComposer {
+
+    ArrayList<SoundSource> SoundSources = new ArrayList<SoundSource>();
+    AL al;
+    float Listenerx = 0;
+    float Listenery = 0;
+    float Listenerz = 0;
+    float ListenerVelx = 0;
+    float ListenerVely = 0;
+    float ListenerVelz = 0;
+    float ListenerOrix = 0;
+    float ListenerOriy = 0;
+    float ListenerOriz = 0;
+    int buffer[];
+    int[] sources;
+    int CurrentlyPlayingId = -1;
+    int playone = 0;
+    ///
+    static int PlayOnlyOne = 1;
+    static int PlayMultiple = 0;
+
+    public SoundComposer() {
+        //ALut.alutInit();
+        ALut.alutInit();
+        al = ALFactory.getAL();
+    }
+
+    public void addToSoundSources(SoundSource sound) {
+
+        SoundSources.add(sound);
+        SoundCreater a = (SoundCreater) sound;
+        a.createWave();
+    }
+
+    public void setListenerValues() {
+        al.alListenerfv(AL.AL_POSITION, new float[]{Listenerx, Listenery, Listenerz}, 0);
+        al.alListenerfv(AL.AL_VELOCITY, new float[]{ListenerVelx, ListenerVely, ListenerVelz}, 0);
+        al.alListenerfv(AL.AL_ORIENTATION, new float[]{0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f}, 0);
+    }
+
+    public void loadSoundSources() {
+
+        int[] format = new int[1];
+        int[] size = new int[1];
+        ByteBuffer[] data = new ByteBuffer[1];
+        int[] freq = new int[1];
+        int[] loop = new int[1];
+        int noofsources = SoundSources.size();
+        buffer = new int[noofsources];
+        sources = new int[noofsources];
+        al.alGenBuffers(noofsources, buffer, 0);
+        al.alGenSources(noofsources, sources, 0);
+        //buffers and the sources are generated at the same time;
+        if (al.alGetError() != AL.AL_NO_ERROR) {
+            System.out.println("Error at generating sources");
+        }
+        System.out.println("size" + noofsources);
+        int i = 0;
+        for (SoundSource sound : SoundSources) {
+            ALut.alutLoadWAVFile(sound.AudioPath, format, data, size, freq, loop);
+
+            al.alBufferData(buffer[i], format[0], data[0], size[0], freq[0]);
+            sound.SourceID = i;
+            System.out.println(sound.SourceID + "==" + buffer[i]);
+            //
+            sound.SourceID = sources[i];
+            al.alSourcei(sources[i], AL.AL_BUFFER, buffer[i]);
+            al.alSourcef(sources[i], AL.AL_PITCH, 1.0f);
+            al.alSourcef(sources[i], AL.AL_GAIN, 1.0f);
+            al.alSourcefv(sources[i], AL.AL_POSITION, new float[]{sound.x, sound.y, sound.z}, 0);
+            al.alSourcefv(sources[i], AL.AL_VELOCITY, new float[]{sound.vx, sound.vy, sound.vz}, 0);
+            al.alSourcei(sources[i], AL.AL_LOOPING, sound.loop);
+            //
+            i++;
+        }
+        setListenerValues();
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(
+                new Thread(
+                new Runnable() {
+                    public void run() {
+                        killALData();
+                    }
+                }));
+    }
+    void killALData() {
+        al.alDeleteBuffers(1, buffer, 0);
+        al.alDeleteSources(1, sources, 0);
+        ALut.alutExit();
+    }
+
+    public void play(int sourceid) {
+        System.out.println(sourceid);
+        int[] state = new int[1];
+        al.alGetSourcei(sourceid, AL.AL_SOURCE_STATE, state, 0);
+        if (!(state[0] == AL.AL_PLAYING)) {
+            if (this.CurrentlyPlayingId != -1 && this.playone == SoundComposer.PlayOnlyOne) {
+                al.alSourceStop(CurrentlyPlayingId);
+            }
+
+            al.alSourcePlay(sourceid);
+            this.CurrentlyPlayingId = sourceid;
+        } else {
+            System.out.println("already playing");
+        }
+    }
+
+    public void stop(int sourceid) {
+        System.out.println(sourceid);
+        int[] state = new int[1];
+        al.alGetSourcei(sourceid, AL.AL_SOURCE_STATE, state, 0);
+        if ((state[0] == AL.AL_PLAYING)) {
+            al.alSourceStop(sourceid);
+        } else {
+            System.out.println("already stopped");
+        }
+    }
+}

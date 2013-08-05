@@ -1,0 +1,89 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package catchaction;
+
+import joal.AudioEffect;
+
+/**
+ *
+ * @author kanishka
+ */
+public class BComponant extends SoundCreater{
+
+    private String Title;
+    private String AudioContentPath;
+    private Boolean isFocussed;
+    private int Colomn;
+    private int Row;
+    private int TotalRows;
+
+    public void setAndPlay() {
+        float yaxis = 2 / this.TotalRows * this.Row;
+        float xaxis = this.Colomn - 1;
+        AudioEffect auo = new AudioEffect();
+        AudioEffect.sourcex = xaxis;
+        AudioEffect.sourcey = yaxis;
+        auo.main(new String[5]);
+    }
+
+    public void getName() {
+    }
+
+    public String toString() {
+        return this.getTitle();
+    }
+
+    public String getTitle() {
+        return Title;
+    }
+
+    public void setTitle(String Title) {
+        this.SaveName=Title;
+        this.Title = Title;
+    }
+
+    public String getAudioContentPath() {
+        return AudioContentPath;
+    }
+
+    public void setAudioContentPath(String AudioContentPath) {
+        this.AudioContentPath = AudioContentPath;
+    }
+
+    public Boolean getIsFocussed() {
+        return isFocussed;
+    }
+
+    public void setIsFocussed(Boolean isFocussed) {
+        this.isFocussed = isFocussed;
+    }
+
+    public int getColomn() {
+        return Colomn;
+    }
+
+    public void setColomn(int Colomn) {
+        this.Colomn = Colomn;
+    }
+
+    public int getRow() {
+        return Row;
+    }
+
+    public void setRow(int Row) {
+        this.Row = Row;
+    }
+
+    public int getTotalRows() {
+        return TotalRows;
+    }
+
+    /**
+     * @param TotalRows the TotalRows to set
+     */
+    public void setTotalRows(int TotalRows) {
+        this.TotalRows = TotalRows;
+    }
+}
